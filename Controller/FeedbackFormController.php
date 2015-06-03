@@ -29,8 +29,19 @@ class FeedbackFormController extends Controller
      */
     public function showFeedbackFormAction( Location $location, $viewType, $layout = false, array $params = array() )
     {
-        // Creating a form using Symfony's form component
+         // Creating a form using Symfony's form component
         $feedback = new Feedback();
+        // Check if user is logged and prefill fields with data from the user
+
+        /** @var \eZ\Publish\Core\MVC\Symfony\Security\User $user */
+        if ( $user = $this->getUser() )
+        {
+            $content = $user->getAPIUser();
+            $feedback->firstName = $content->getFieldValue( 'first_name' )->text;
+            $feedback->lastName = $content->getFieldValue( 'last_name' )->text;
+            $feedback->email = $content->email;
+        }
+
         $form = $this->createForm( $this->get( 'ezdemo.form.type.feedback' ), $feedback );
         $request = $this->getRequest();
 
